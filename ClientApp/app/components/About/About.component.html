@@ -1,0 +1,21 @@
+﻿<p>key up event</p>
+<input (keyup)="onKey($event)">
+<p>{{values}}</p>
+<br />
+<p>reference variable with the # sign</p>
+<input #box (keyup)="1">
+<p>{{box.value}}</p>
+<br/>
+
+<p>Key Enter Event</p>
+<input #mybox (keyup.enter)="onEnter(mybox.value)" (blur)="onEnter(mybox.value)">
+<p>{{keyEnterValue}}</p>
+
+
+<p>Add Any Thing to the list </p>
+<input #AddItem (keyup.enter) ="addItem(AddItem.value);  AddItem.value='' " (blur)="addItem(AddItem.value); AddItem.value='' ">
+<button (click)="AddItem(AddItem.value)">Add</button>
+
+<ul>
+    <li *ngFor="let item of items">{{item}}</li>
+</ul>

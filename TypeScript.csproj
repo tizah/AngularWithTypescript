@@ -1,0 +1,111 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
+    <Content Remove="ClientApp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ClientApp\app\components\About\About.component.ts" />
+    <None Remove="ClientApp\app\components\account\account.component.ts" />
+    <None Remove="ClientApp\app\components\login\login.component.ts" />
+    <None Remove="ClientApp\app\components\shared\account-summary.type.ts" />
+    <None Remove="ClientApp\app\components\shared\header\account-type.enum.ts" />
+    <None Remove="ClientApp\app\components\shared\header\header.component.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\assets\images\brands\bulma-white.svg" />
+    <None Include="wwwroot\assets\images\brands\bulma.svg" />
+    <None Include="wwwroot\assets\images\brands\gulp-white.svg" />
+    <None Include="wwwroot\assets\images\brands\gulp.svg" />
+    <None Include="wwwroot\assets\images\brands\html5-white.svg" />
+    <None Include="wwwroot\assets\images\brands\paypal.svg" />
+    <None Include="wwwroot\assets\images\brands\sass-white.svg" />
+    <None Include="wwwroot\assets\images\brands\sass.svg" />
+    <None Include="wwwroot\assets\images\icons\bank.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\chart.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\clock.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\autocompletes.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\buttons.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\cards.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\datepicker.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\inputs.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\selects.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\spinners.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\elements\tabs.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\monitor.svg" />
+    <None Include="wwwroot\assets\images\icons\demo\phone.svg" />
+    <None Include="wwwroot\assets\images\icons\money.svg" />
+    <None Include="wwwroot\assets\images\icons\new-cart.svg" />
+    <None Include="wwwroot\assets\images\icons\order.svg" />
+    <None Include="wwwroot\assets\images\logo\nephos-gold.svg" />
+    <None Include="wwwroot\assets\images\logo\nephos-greyscale.svg" />
+    <None Include="wwwroot\assets\images\logo\nephos-referral.svg" />
+    <None Include="wwwroot\assets\images\logo\nephos-white.svg" />
+    <None Include="wwwroot\assets\images\logo\nephos.svg" />
+    <None Include="wwwroot\assets\js\app.js" />
+    <None Include="wwwroot\assets\js\datepicker\datepicker.min.js" />
+    <None Include="wwwroot\assets\js\demo.js" />
+    <None Include="wwwroot\assets\js\easyautocomplete\jquery.easy-autocomplete.min.js" />
+    <None Include="wwwroot\assets\js\elements.js" />
+    <None Include="wwwroot\assets\js\external\inputspinner.js" />
+    <None Include="wwwroot\assets\js\nephos.js" />
+    <None Include="wwwroot\assets\js\slick\fonts\slick.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\app\components\About\About.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\account\account.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\login\login.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\shared\account-summary.type.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\shared\account-type.enum.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\shared\header\header.component.ts" />
+  </ItemGroup>
+
+  <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
+    <!-- Ensure Node.js is installed -->
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+
+    <!-- In development, the dist files won't exist on the first run or when cloning to
+         a different machine, so rebuild them if not already present. -->
+    <Message Importance="high" Text="Performing first-run Webpack build..." />
+    <Exec Command="node node_modules/webpack/bin/webpack.js --config webpack.config.vendor.js" />
+    <Exec Command="node node_modules/webpack/bin/webpack.js" />
+  </Target>
+
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+    <Exec Command="npm install" />
+    <Exec Command="node node_modules/webpack/bin/webpack.js --config webpack.config.vendor.js --env.prod" />
+    <Exec Command="node node_modules/webpack/bin/webpack.js --env.prod" />
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <DistFiles Include="wwwroot\dist\**; ClientApp\dist\**" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(DistFiles.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+</Project>
